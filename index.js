@@ -3,12 +3,13 @@ const LAUNCH_MESSAGE = "Welcome to Fizz Buzz. Please say 'help' to hear the inst
 const FALLBACK_LAUNCH_MESSAGE = "Sorry, I'm not sure what you meant. Please say 'help' to hear the instructions or say 'start' if you would like to begin the game!";
 const FALLBACK_GAME_MESSAGE = "Sorry, I'm not sure what you meant. Try responding with a number, fizz, buzz, or fizzbuzz.";
 const FALLBACK_GAME_REPROMPT = 'Please respond with a number, fizz, buzz, or fizzbuzz.';
-const LOSE_MESSAGE = "Sorry, you lost. Would you like to play again?";
+const LOSE_MESSAGE = ["Sorry, you lost. ", "Better luck next time! ", "Sorry, you lost. Maybe try Siri for a better chance of winning! "];
+const LOSE_MESSAGE_FOLLOWUP = "We played num rounds this session. Would you like to play again?";
 const CONTINUE_MESSAGE = "Say 'yes' to play, 'no' to quit, or 'help' to hear the instructions.";
 const HELP_MESSAGE = 'Starting from 1, we take turns counting upwards. Any number divisible by three should be replaced by the word fizz, any number divisible by five would be replaced by the word buzz, and numbers divisible by 15 would be replaced with fizz buzz. Would you like to start playing?';
 const ERROR_MESSAGE = 'Sorry, there was an error.';
-const YES_MESSAGE = "Awesome! I'll go first... 1.";
-const NEXT_VALUE_MESSAGE = "num. Your turn!"
+const YES_MESSAGE = ["Awesome! I'll go first... 1.", "Great! I'll start with 1."];
+const NEXT_VALUE_MESSAGE = ["num. Your turn!", "num", "num. You go next!"];
 
 var gameRunning = false; //set gameRunning flag to false initially
 var nextNum = 2; //stores the number to be said by the user
@@ -18,7 +19,8 @@ const Alexa = require('ask-sdk');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
+        return Alexa.isNewSession(handlerInput.requestEnvelope) 
+            || Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     async handle(handlerInput) {
         gameRunning = false; //set game running flag to false
@@ -74,22 +76,14 @@ const StartIntentHandler = {
         
         //set up beginning variables
         nextNum = 2;
-        nextValueAlexa = '1'; 
+        nextValueAlexa = 1; 
 
         return handlerInput.responseBuilder
-            .speak(YES_MESSAGE)
+            .speak(randomResponse(YES_MESSAGE))
             .reprompt(CONTINUE_MESSAGE)
             .getResponse();
     }
 };
-
-//helper function to find the correct response to a number/value
-function fizzBuzzResponse(num) {
-    if (num % 3 === 0 && num % 5 !== 0) return "fizz";
-    if (num % 5 === 0 && num % 3 !== 0) return "buzz";
-    if (num % 3 === 0 && num % 5 === 0) return "fizz buzz";
-    else return num;
-}
 
 //game logic for fizz buzz
 const NextValueIntentHandler = {
@@ -101,27 +95,24 @@ const NextValueIntentHandler = {
     handle(handlerInput) {
         const correctResponse = fizzBuzzResponse(nextNum);
         const guessNum = parseInt(Alexa.getSlotValue(handlerInput.requestEnvelope, 'number'), 10);
-        const guessFizz = Alexa.getSlotValue(handlerInput.requestEnvelope, 'fizz');
-        const guessBuzz = Alexa.getSlotValue(handlerInput.requestEnvelope, 'buzz');
         const guessFizzBuzz = Alexa.getSlotValue(handlerInput.requestEnvelope, 'fizzbuzz');
         const isNum = typeof correctResponse === "number"
 
-        //the correct response is given and Alexa responds with the next value
-        if ((isNum && guessNum === correctResponse) || (!isNum && (guessFizz === correctResponse || guessBuzz === correctResponse || guessFizzBuzz === correctResponse))) {
+        //case where the user response is correct
+        if ((isNum && guessNum === correctResponse) || (!isNum && guessFizzBuzz === correctResponse)) {
             //Assign Alexa's response to nextNum++ and iterate the next number by 2
-            nextValueAlexa = (fizzBuzzResponse(nextNum + 1)).toString();
+            nextValueAlexa = (fizzBuzzResponse(nextNum + 1));
 		    nextNum += 2;
             
             return handlerInput.responseBuilder
-		    .speak(NEXT_VALUE_MESSAGE.replace("num", nextValueAlexa))
-		    .reprompt(NEXT_VALUE_MESSAGE.replace("num", nextValueAlexa))
+		    .speak(randomResponse(NEXT_VALUE_MESSAGE).replace("num", nextValueAlexa))
+		    .reprompt(randomResponse(NEXT_VALUE_MESSAGE).replace("num", nextValueAlexa))
 		    .getResponse();
-
-        //the incorrect response is given
+		//user response is incorrect
         } else {
             gameRunning = false; //set game running flag to false
             return handlerInput.responseBuilder
-		    .speak(LOSE_MESSAGE)
+		    .speak(randomResponse(LOSE_MESSAGE) + LOSE_MESSAGE_FOLLOWUP.replace("num", nextNum))
 		    .reprompt(CONTINUE_MESSAGE)
 		    .getResponse();
         }    
@@ -132,7 +123,9 @@ const NextValueIntentHandler = {
 const FallbackHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
+            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent'
+            || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.YesIntent'
+            || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.NoIntent');
     },
     handle(handlerInput) {
 
@@ -176,6 +169,21 @@ const ErrorHandler = {
             .getResponse();
     }
 };
+
+//helper function to find the correct response to a number/value
+function fizzBuzzResponse(num) {
+    if (num % 3 === 0 && num % 5 !== 0) return "fizz";
+    if (num % 5 === 0 && num % 3 !== 0) return "buzz";
+    if (num % 3 === 0 && num % 5 === 0) return "fizz buzz";
+    else return num;
+}
+
+//helper function to randomize Alexa's responses
+function randomResponse(data) {
+    var i = 0;
+    i = Math.floor(Math.random() * data.length);
+    return(data[i]);
+}
 
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
