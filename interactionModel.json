@@ -1,0 +1,194 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "fizz buzz",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "NextValueIntent",
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER"
+                        },
+                        {
+                            "name": "fizz",
+                            "type": "FizzResponse"
+                        },
+                        {
+                            "name": "buzz",
+                            "type": "BuzzReponse"
+                        },
+                        {
+                            "name": "fizzbuzz",
+                            "type": "FizzBuzzResponse",
+                            "multipleValues": {
+                                "enabled": true
+                            }
+                        }
+                    ],
+                    "samples": [
+                        "{fizzbuzz}",
+                        "{buzz}",
+                        "{fizz}",
+                        "{number}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.YesIntent",
+                    "samples": [
+                        "start",
+                        "yes"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NoIntent",
+                    "samples": []
+                }
+            ],
+            "types": [
+                {
+                    "name": "FizzResponse",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "fizz"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "BuzzReponse",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "buzz"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "FizzBuzzResponse",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "fizz buzz"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "fizzbuzz"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "NextValueIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        },
+                        {
+                            "name": "fizz",
+                            "type": "FizzResponse",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {},
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.57961417429.1204023061079.599951760610"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "buzz",
+                            "type": "BuzzReponse",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {},
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.57961417429.514148298455.634543801497"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "fizzbuzz",
+                            "type": "FizzBuzzResponse",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {},
+                            "validations": [
+                                {
+                                    "type": "hasEntityResolutionMatch",
+                                    "prompt": "Slot.Validation.57961417429.1478368890234.1018355634279"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Slot.Validation.57961417429.514148298455.634543801497",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Sorry, I'm not sure what you meant. Please try again."
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.57961417429.1478368890234.1018355634279",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Sorry, I'm not sure what you meant. Please try again."
+                    }
+                ]
+            },
+            {
+                "id": "Slot.Validation.57961417429.1204023061079.599951760610",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Sorry, I'm not sure what you meant. Please try again."
+                    }
+                ]
+            }
+        ]
+    }
+}

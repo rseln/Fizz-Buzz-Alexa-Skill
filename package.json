@@ -1,0 +1,29 @@
+{
+  "name": "@rseln/fizz-buzz-alexa-skill",
+  "version": "1.0.0",
+  "description": "An Alexa skill that lets users play a voice-controlled version of Fizz Buzz!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rseln/Fizz-Buzz-Alexa-Skill.git"
+  },
+  "author": "Rose Lin <rose.shiru.lin@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rseln/Fizz-Buzz-Alexa-Skill/issues"
+  },
+  "homepage": "https://github.com/rseln/Fizz-Buzz-Alexa-Skill#readme",
+  "dependencies": {
+    "ask-sdk": "^2.11.0",
+    "ask-sdk-core": "^2.11.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.11.0",
+    "ask-sdk-model": "^1.29.0",
+    "ask-sdk-s3-persistence-adapter": "^2.11.0"
+  },
+  "devDependencies": {
+    "ask-sdk-local-debug": "^1.1.0"
+  }
+}
