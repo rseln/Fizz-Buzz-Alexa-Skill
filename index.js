@@ -4,7 +4,7 @@ const FALLBACK_LAUNCH_MESSAGE = "Sorry, I'm not sure what you meant. Please say 
 const FALLBACK_GAME_MESSAGE = "Sorry, I'm not sure what you meant. Try responding with a number, fizz, buzz, or fizzbuzz.";
 const FALLBACK_GAME_REPROMPT = 'Please respond with a number, fizz, buzz, or fizzbuzz.';
 const LOSE_MESSAGE = ["Sorry, you lost. ", "Better luck next time! ", "Sorry, you lost. Maybe try Siri for a better chance of winning! "];
-const LOSE_MESSAGE_FOLLOWUP = "We played num rounds this session. Would you like to play again?";
+const LOSE_MESSAGE_FOLLOWUP = "The correct answer was num1. Your highscore is num2 rounds. Would you like to play again?";
 const CONTINUE_MESSAGE = "Say 'yes' to play, 'no' to quit, or 'help' to hear the instructions.";
 const HELP_MESSAGE = 'Starting from 1, we take turns counting upwards. Any number divisible by three should be replaced by the word fizz, any number divisible by five would be replaced by the word buzz, and numbers divisible by 15 would be replaced with fizz buzz. Would you like to start playing?';
 const ERROR_MESSAGE = 'Sorry, there was an error.';
@@ -14,6 +14,7 @@ const NEXT_VALUE_MESSAGE = ["num. Your turn!", "num", "num. You go next!"];
 var gameRunning = false; //set gameRunning flag to false initially
 var nextNum = 2; //stores the number to be said by the user
 var nextValueAlexa = '1'; //stores Alexa's response
+var highscore = 0;
 
 const Alexa = require('ask-sdk');
 
@@ -22,7 +23,7 @@ const LaunchRequestHandler = {
         return Alexa.isNewSession(handlerInput.requestEnvelope) 
             || Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
-    async handle(handlerInput) {
+    handle(handlerInput) {
         gameRunning = false; //set game running flag to false
         
         return handlerInput.responseBuilder
@@ -74,7 +75,7 @@ const StartIntentHandler = {
     handle(handlerInput) {
         gameRunning = true; //set game running flag to true
         
-        //set up beginning variables
+        //set up launch variables
         nextNum = 2;
         nextValueAlexa = 1; 
 
@@ -111,8 +112,10 @@ const NextValueIntentHandler = {
 		//user response is incorrect
         } else {
             gameRunning = false; //set game running flag to false
+            highscore = Math.max((nextNum - 1), highscore);
+            
             return handlerInput.responseBuilder
-		    .speak(randomResponse(LOSE_MESSAGE) + LOSE_MESSAGE_FOLLOWUP.replace("num", nextNum))
+		    .speak(randomResponse(LOSE_MESSAGE) + LOSE_MESSAGE_FOLLOWUP.replace("num1", fizzBuzzResponse(nextNum)).replace("num2", highscore))
 		    .reprompt(CONTINUE_MESSAGE)
 		    .getResponse();
         }    
