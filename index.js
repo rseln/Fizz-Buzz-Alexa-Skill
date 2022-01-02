@@ -10,11 +10,12 @@ const HELP_MESSAGE = 'Starting from 1, we take turns counting upwards. Any numbe
 const ERROR_MESSAGE = 'Sorry, there was an error.';
 const YES_MESSAGE = ["Awesome! I'll go first... 1.", "Great! I'll start with 1."];
 const NEXT_VALUE_MESSAGE = ["num. Your turn!", "num", "num. You go next!"];
+const REPEAT_GAME_MESSAGE = "Sure! I said num.";
 
 var gameRunning = false; //set gameRunning flag to false initially
 var nextNum = 2; //stores the number to be said by the user
 var nextValueAlexa = '1'; //stores Alexa's response
-var highscore = 0;
+var highscore = 0; //stores high score
 
 const Alexa = require('ask-sdk');
 
@@ -46,7 +47,7 @@ const HelpIntentHandler = {
     }
 };
 
-//user responds does not want to play
+//user does not want to play
 const CancelAndStopIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -60,6 +61,31 @@ const CancelAndStopIntentHandler = {
         return handlerInput.responseBuilder
             .speak(EXIT_MESSAGE)
             .withShouldEndSession(true)
+            .getResponse();
+    }
+};
+
+//user asks to repeat
+const RepeatIntentHandler = {
+    canHandle(handlerInput) {
+
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.RepeatIntent';
+    },
+    handle(handlerInput) {
+        
+        //if the game is running
+        if (gameRunning) {
+            return handlerInput.responseBuilder
+                .speak(REPEAT_GAME_MESSAGE.replace("num", nextValueAlexa))
+                .reprompt(REPEAT_GAME_MESSAGE.replace("num", nextValueAlexa))
+                .getResponse();
+        }
+
+        //if the game is not running
+        return handlerInput.responseBuilder
+            .speak(CONTINUE_MESSAGE)
+            .reprompt(CONTINUE_MESSAGE)
             .getResponse();
     }
 };
@@ -193,6 +219,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         LaunchRequestHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
+        RepeatIntentHandler,
         StartIntentHandler,
         NextValueIntentHandler,
         FallbackHandler,
